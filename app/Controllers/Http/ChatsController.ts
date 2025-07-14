@@ -18,31 +18,44 @@ export default class ChatsController {
   }
 
   public async index(ctx: HttpContext) {
-    const conversations = await Conversation.query().preload("messages")
+    const page = Number(ctx.request.input('page', 1))
+    const limit = Number(ctx.request.input('limit', 10))
 
-    const data = conversations.map((conversation) => {
-      const serialized = conversation.toJSON()
+    const conversations = await Conversation
+      .query()
+      .preload("messages")
+      .paginate(page, limit)
 
+    const paginated = conversations.toJSON()
+
+    const formattedData = paginated.data.map((conversation) => {
       return {
-        ...serialized,
-        last_messages: this.tryParseJSON(serialized.last_messages),
-        messages: serialized.messages.map((message: any) => {
-          return {
-            ...message,
-            message: this.tryParseJSON(message.message)
-          }
-        })
+        id: conversation.id,
+        session_id: conversation.session_id,
+        last_messages: this.tryParseJSON(conversation.last_messages),
+        messages: conversation.messages.map((message: any) => ({
+          id: message.id,
+          sender_type: message.sender_type,
+          message: this.tryParseJSON(message.message),
+          createdAt: message.createdAt,
+          updatedAt: message.updatedAt,
+          conversationId: message.conversationId
+        })),
+        createdAt: conversation.createdAt,
+        updatedAt: conversation.updatedAt
       }
     })
 
-    return ctx.response.ok(
-      {
-        status: 200,
-        message: "success",
-        data
-      }
-    )
+    return ctx.response.ok({
+      status: 200,
+      message: "success",
+      meta: {
+        ...paginated.meta,
+      },
+      data: formattedData
+    })
   }
+
 
   public async show(ctx: HttpContext) {
     const { id } = ctx.request.params()
@@ -67,9 +80,6 @@ export default class ChatsController {
         message: "not found"
       })
     }
-
-
-
 
     return ctx.response.ok({
       status: 200,
