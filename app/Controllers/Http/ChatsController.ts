@@ -65,11 +65,7 @@ export default class ChatsController {
       return ctx.response.badRequest({
         status: 400,
         message: "Validation failure",
-        error: [
-          {
-            message: "invalid id",
-          }
-        ]
+        error: "invalid id",
       })
     }
     const conversationData = await Conversation.query().where('id', id).preload("messages").first()
@@ -77,7 +73,8 @@ export default class ChatsController {
     if (!conversationData) {
       return ctx.response.notFound({
         status: 404,
-        message: "not found"
+        message: "not found",
+        error: "data not found"
       })
     }
 
@@ -118,7 +115,7 @@ export default class ChatsController {
       return ctx.response.badRequest({
         status: 404,
         message: "not found",
-        error: "conversation with yout session_id is not found"
+        error: "conversation with your session_id is not found"
       })
     }
 
@@ -177,7 +174,8 @@ export default class ChatsController {
     if (!conversationData) {
       return ctx.response.notFound({
         status: 404,
-        message: "not found"
+        message: "not found",
+        error: "data not found"
       })
     }
 
@@ -203,11 +201,7 @@ export default class ChatsController {
       return ctx.response.badRequest({
         status: 400,
         message: "Validation failure",
-        error: [
-          {
-            message: "invalid id",
-          }
-        ]
+        error: "invalid id",
       })
     }
 
@@ -216,7 +210,8 @@ export default class ChatsController {
     if (!messageData) {
       return ctx.response.notFound({
         status: 404,
-        message: "not found"
+        message: "not found",
+        error: "data not found"
       })
     }
 
