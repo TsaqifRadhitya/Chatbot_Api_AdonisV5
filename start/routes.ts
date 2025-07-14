@@ -21,12 +21,17 @@
 import router from '@ioc:Adonis/Core/Route'
 
 router.group(() => {
-  router.get('/', 'ChatsController.index')
-  router.get(':id', 'ChatsController.show')
 
-  router.delete('/message/:id', 'ChatsController.destroyMessage')
-  'ChatsController.destroy'
-  router.delete(':id', 'ChatsController.destroy')
-}).prefix('conversation').middleware("auth_basic")
+  router.group(() => {
+    router.get('/', 'ChatsController.index')
+    router.get(':id', 'ChatsController.show')
 
-router.post('questions', 'ChatsController.store')
+    router.delete('/message/:id', 'ChatsController.destroyMessage')
+    'ChatsController.destroy'
+    router.delete(':id', 'ChatsController.destroy')
+  }).prefix('conversation').middleware("auth_basic")
+
+  router.post('questions', 'ChatsController.store')
+
+}).prefix('api')
+
